@@ -1,0 +1,48 @@
+variables:
+  BuildPlatform: 'any cpu'
+  BuildConfiguration: 'release'
+
+resources:
+  repositories:
+  - repository: self
+
+pool:
+  vmImage: 'windows-latest'
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+
+pr:
+  branches:
+    include:
+    - master
+
+steps:
+- task: CopyFiles@2
+  displayName: 'Copy Function files'
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)'
+    contents: |
+      Modules/**
+      MonitorAlert/**
+      host.json
+      profile.ps1
+      requirements.psd1
+      proxies.json
+    targetFolder: '$(Build.SourcesDirectory)/FunctionZip'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/FunctionZip'
+    includeRootFolder: false
+    archiveType: zip 
+    archiveFile: '$(Build.ArtifactStagingDirectory)/slack_azure_function.zip' 
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+     pathtoPublish: $(Build.ArtifactStagingDirectory)
+     artifactName: Dfc.AzureMonitorToSlack
