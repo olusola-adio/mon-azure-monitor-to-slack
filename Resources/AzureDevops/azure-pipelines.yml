@@ -24,7 +24,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Function files'
   inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
+    sourceFolder: '$(Build.SourcesDirectory)/MonitorAlert'
     contents: |
       Modules/**
       MonitorAlert/**
@@ -32,17 +32,35 @@ steps:
       profile.ps1
       requirements.psd1
       proxies.json
-    targetFolder: '$(Build.SourcesDirectory)/FunctionZip'
+    targetFolder: '$(Build.SourcesDirectory)/MonitorAlertZip'
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.SourcesDirectory)/FunctionZip'
+    rootFolderOrFile: '$(Build.SourcesDirectory)/MonitorAlertZip'
     includeRootFolder: false
     archiveType: zip 
     archiveFile: '$(Build.ArtifactStagingDirectory)/slack_azure_function.zip' 
 
+- task: CopyFiles@2
+  displayName: 'Copy Function files'
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)/PostMessageToSlack'
+    contents: |
+      PostMessageToSlack/**
+      host.json
+      profile.ps1
+      requirements.psd1
+    targetFolder: '$(Build.SourcesDirectory)/PostMessageToSlackZip'
+   
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/PostMessageToSlackZip'
+    includeRootFolder: false
+    archiveType: zip 
+    archiveFile: '$(Build.ArtifactStagingDirectory)/PostMessageToSlackZip.zip' 
+   
 - task: PublishBuildArtifacts@1
   displayName: Publish Artifact
   inputs:
-     pathtoPublish: $(Build.ArtifactStagingDirectory)
-     artifactName: Mon.AzureMonitorToSlack
+    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: Mon.AzureMonitorToSlack
