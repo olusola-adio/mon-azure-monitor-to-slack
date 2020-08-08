@@ -50,3 +50,9 @@ steps:
     includeRootFolder: false
     archiveType: zip 
     archiveFile: '$(Build.ArtifactStagingDirectory)/slack_azure_function.zip' 
+   
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: Mon.AzureMonitorToSlack
