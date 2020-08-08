@@ -9,7 +9,7 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 # Interact with query parameters or the body of the request.
 $yourUri = "https://hooks.slack.com/services/"
 
-$hook = "T38B60AJ2/B0162TB18KA/PQZZR8t2isxPmcEWuA77hN8a"
+$hook = $env:SLACKTOKEN
 
 
 $name = $Request.Query.Username
