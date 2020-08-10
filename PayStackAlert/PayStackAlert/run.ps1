@@ -100,14 +100,19 @@ if($null -eq $request.Body.event) {
 }
 
 
-$body = $request.Body
+
 $jsonRequest = @{    
     paystack = "request"
-    body = "$body"
+    body = "to_string"
 
 }
 
+Write-Information "jsonRequest $($jsonRequest)" -Verbose
+
 $jsonObject = $jsonRequest | ConvertTo-Json
+
+Write-Information "jsonObject  $($jsonObject)" -Verbose
+
 $jsonString = $jsonObject
 
 
@@ -116,8 +121,9 @@ $jsonString = $jsonObject
 $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
 $hmacsha.key = [Text.Encoding]::ASCII.GetBytes($secret)
 $signature = $hmacsha.ComputeHash([Text.Encoding]::ASCII.GetBytes($jsonString))
-$signature = [Convert]::ToBase64String($signature)
+$signature = [System.BitConverter]::ToString($signature);
 $signature = $signature.Replace("-","")
+$signature = $signature.ToLower()
 Write-Information "Computed signature $($signature)" -Verbose
 $suppliedSignature = $Request.Headers["x-paystack-signature"]
 Write-Information "Supplied signature $($suppliedSignature)" -Verbose
@@ -141,4 +147,4 @@ catch {
     return     
 }
 
-Push-OutputBindingWrapper -Status OK -Body "Message successfully sent to slack!"
+Push-OutputBindingWrapper -Status OK -Body ""
