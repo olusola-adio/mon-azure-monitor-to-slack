@@ -79,7 +79,7 @@ hashtable. The slack message
         attachments = @(
             @{
                 color= "good"
-                title = "$($encodedEvent) for $($AleAlertJsonDatart.Data.Amount)kobo from $($AlertJsonData.customer.first_name) $($AlertJsonData.customer.last_name)"
+                title = "$($encodedEvent) for $($Alert.Data.amount)kobo from $($Alert.Data.customer.first_name) $($Alert.Data.customer.last_name)"
                 text = "$($AlertJsonData)"
             }
         ) 
