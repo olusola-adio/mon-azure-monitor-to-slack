@@ -147,4 +147,4 @@ catch {
     return     
 }
 
-Push-OutputBindingWrapper -Status OK -Body ""
+Push-OutputBindingWrapper -Status OK -Body "success"
