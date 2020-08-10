@@ -108,7 +108,7 @@ $jsonRequest = @{
 }
 
 $jsonObject = $jsonRequest | ConvertTo-Json
-$jsonString = $jsonObject | ConvertTo-String
+$jsonString = $jsonObject
 
 
 
