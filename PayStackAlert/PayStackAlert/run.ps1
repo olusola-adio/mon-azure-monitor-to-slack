@@ -118,15 +118,15 @@ $hmacsha.key = [Text.Encoding]::ASCII.GetBytes($secret)
 $signature = $hmacsha.ComputeHash([Text.Encoding]::ASCII.GetBytes($jsonString))
 $signature = [Convert]::ToBase64String($signature)
 $signature = $signature.Replace("-","")
-Write-Verbose "Computed signature $($signature)" -Verbose
+Write-Information "Computed signature $($signature)" -Verbose
 $suppliedSignature = $Request.Headers["x-paystack-signature"]
-Write-Verbose "Supplied signature $($suppliedSignature)" -Verbose
+Write-Information "Supplied signature $($suppliedSignature)" -Verbose
 
 
 # Do we get the expected signature?
 if ($signature -ne $suppliedSignature) {
     # Push-OutputBindingWrapper -Status BadRequest -Body "Failed Signature test"
-    Write-Verbose "Failed Signature test"
+    Write-Information "Failed Signature test"
     #return
 }
 
