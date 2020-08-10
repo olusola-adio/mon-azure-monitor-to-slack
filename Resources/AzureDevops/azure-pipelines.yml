@@ -28,7 +28,6 @@ steps:
     contents: |
       Modules/**
       MonitorAlert/**
-      PostMessageToSlack/**
       host.json
       profile.ps1
       requirements.psd1
@@ -42,6 +41,15 @@ steps:
     sourceFolder: '$(Build.SourcesDirectory)/PostMessageToSlack'
     contents: |
       PostMessageToSlack/**
+    targetFolder: '$(Build.SourcesDirectory)/MonitorAlertZip'
+
+- task: CopyFiles@2
+  displayName: 'Copy Function files'
+  inputs:
+    sourceFolder: '$(Build.SourcesDirectory)/PayStackAlert'
+    contents: |
+      Modules/**
+      PayStackAlert/**
     targetFolder: '$(Build.SourcesDirectory)/MonitorAlertZip'
 
 - task: ArchiveFiles@2
