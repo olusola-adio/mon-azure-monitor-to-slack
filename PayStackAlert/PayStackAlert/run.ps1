@@ -118,7 +118,7 @@ $jsonString = $jsonObject
 
 
 
-$hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+$hmacsha = New-Object System.Security.Cryptography.HMACSHA512
 $hmacsha.key = [Text.Encoding]::ASCII.GetBytes($secret)
 $signature = $hmacsha.ComputeHash([Text.Encoding]::ASCII.GetBytes($jsonString))
 $signature = [System.BitConverter]::ToString($signature);
