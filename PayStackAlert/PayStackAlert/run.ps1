@@ -45,6 +45,29 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 $channel = $Request.Query.Channel
 $slackToken = $env:SLACKTOKEN
 
+
+# String key = "YOUR_SECRET_KEY"; //replace with your paystack secret_key
+#       String jsonInput = "{"paystack":"request","body":"to_string"}"; //the json input
+#       String inputString = Convert.ToString(new JValue(jsonInput));
+#       String result = "";
+#       byte[] secretkeyBytes = Encoding.UTF8.GetBytes(key);
+#       byte[] inputBytes = Encoding.UTF8.GetBytes(inputString);
+#       using (var hmac = new HMACSHA512(secretkeyBytes))
+#       {
+#           byte[] hashValue = hmac.ComputeHash(inputBytes);
+#           result = BitConverter.ToString(hashValue).Replace("-", string.Empty);;
+#       }
+#       Console.WriteLine(result);
+#       String xpaystackSignature = ""; //put in the request's header value for x-paystack-signature
+  
+#       if(result.ToLower().Equals(xpaystackSignature)) {
+#           // you can trust the event, it came from paystack
+#           // respond with the http 200 response immediately before attempting to process the response
+#           //retrieve the request body, and deliver value to the customer
+#       } else {
+#           // this isn't from Paystack, ignore it
+#       }
+
 if ([string]::IsNullOrWhiteSpace($channel)) {
     Push-OutputBindingWrapper -Status BadRequest -Body "channel not specified in query"   
     return
@@ -52,7 +75,13 @@ if ([string]::IsNullOrWhiteSpace($channel)) {
 
 if ([string]::IsNullOrWhiteSpace($slackToken)) {
     Push-OutputBindingWrapper -Status BadRequest -Body "Slack token not specified"   
-    return
+    return 
+}
+
+$secret = $env:PAYSTACKSECRET
+if ([string]::IsNullOrWhiteSpace($secret)) {
+    Push-OutputBindingWrapper -Status BadRequest -Body "PayStack secret not specified"   
+    return 
 }
 
 if($null -eq $request.Body) { 
@@ -69,6 +98,33 @@ if($null -eq $request.Body.event) {
     Push-OutputBindingWrapper -Status BadRequest -Body "Unable to parse event as json"
     return
 }
+
+
+$body = $request.Body
+$jsonRequest = @{    
+    paystack = "request"
+    body = "$body"
+
+}
+
+$jsonObject = $jsonRequest | ConvertTo-Json
+$jsonString = $jsonObject | ConvertTo-String
+
+
+
+
+$hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+$hmacsha.key = [Text.Encoding]::ASCII.GetBytes($secret)
+$signature = $hmacsha.ComputeHash([Text.Encoding]::ASCII.GetBytes($jsonString))
+$signature = [Convert]::ToBase64String($signature)
+$signature = $signature.Replace("-","")
+
+# Do we get the expected signature?
+if ($signature -ne $Request.Headers["x-paystack-signature"]) {
+    Push-OutputBindingWrapper -Status BadRequest -Body "Unable to parse body as json"
+    return
+}
+
 
 $message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
 
