@@ -100,8 +100,7 @@ if($null -eq $request.Body.event) {
 }
 
 
-$rawBody = Get-Content $Request -Raw | ConvertFrom-Json
-
+$rawBody = ConvertFrom-Json –InputObject $request.Body 
 Write-Information "raw body $($rawBody)" -Verbose
 
 $body = $rawBody | ConvertTo-Json
