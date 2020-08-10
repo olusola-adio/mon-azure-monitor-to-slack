@@ -99,11 +99,13 @@ if($null -eq $request.Body.event) {
     return
 }
 
+$body = $request.body | ConvertTo-Json
 
+Write-Information "body $($body)" -Verbose
 
 $jsonRequest = @{    
     paystack = "request"
-    body = "to_string"
+    body = "$body"
 
 }
 
