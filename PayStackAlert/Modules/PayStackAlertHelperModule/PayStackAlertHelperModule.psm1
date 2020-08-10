@@ -71,6 +71,19 @@ hashtable. The slack message
         [hashtable] $Alert
     )
     
+
+    $alertAttachmentColours = @{
+        "charge.success" = "#ff0000"
+        "subscription.create" = "#ff0000"
+        "transfer.success" = "#ff0000"
+        "transfer.reversed" = "#ff0000"
+        "invoice.create" = "#ff0000"
+        "paymentrequest.success" ="#ff0000"
+        "paymentrequest.pending" = "#ff7e00"
+        "transfer.failed" = "#00a86b"
+        "invoice.payment_failed" = "#00a86b"
+    }
+
     $encodedEvent = EncodeSlackHtmlEntities -ToEncode $Alert.event
     $AlertJsonData = $Alert.Data | ConvertTo-Json  -Depth 4
     
@@ -78,8 +91,8 @@ hashtable. The slack message
         channel = "#$($Channel)"
         attachments = @(
             @{
-                color= "good"
-                title = "$($encodedEvent) for $($Alert.Data.amount)kobo from $($Alert.Data.customer.first_name) $($Alert.Data.customer.last_name)"
+                color=  $alertAttachmentColours[$encodedEvent]
+                title = "$($encodedEvent) for $($Alert.Data.amount / 100)Naira from $($Alert.Data.customer.first_name) $($Alert.Data.customer.last_name)"
                 text = "$($AlertJsonData)"
             }
         ) 
