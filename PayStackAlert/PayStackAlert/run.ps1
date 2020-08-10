@@ -121,7 +121,7 @@ $signature = $signature.Replace("-","")
 
 # Do we get the expected signature?
 if ($signature -ne $Request.Headers["x-paystack-signature"]) {
-    Push-OutputBindingWrapper -Status BadRequest -Body "Unable to parse body as json"
+    Push-OutputBindingWrapper -Status BadRequest -Body "Failed Signature test"
     return
 }
 
