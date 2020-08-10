@@ -99,9 +99,13 @@ if($null -eq $request.Body.event) {
     return
 }
 
-$body = $request.body | ConvertTo-Json
 
-Write-Information "body $($body)" -Verbose
+$rawBody = Get-Content $Request -Raw | ConvertFrom-Json
+
+Write-Information "raw body $($rawBody)" -Verbose
+
+$body = $rawBody | ConvertTo-Json
+Write-Information "raw body $($body)" -Verbose
 
 $jsonRequest = @{    
     paystack = "request"
