@@ -100,11 +100,8 @@ if($null -eq $request.Body.event) {
 }
 
 
-$rawBody = $request.Body | ConvertFrom-Json  
-Write-Information "raw body $($rawBody)" -Verbose
-
-$body = $rawBody | ConvertTo-Json
-Write-Information "raw body $($body)" -Verbose
+$body = $request.Body | ConvertTo-Json
+Write-Information "body $($body)" -Verbose
 
 $jsonRequest = @{    
     paystack = "request"
