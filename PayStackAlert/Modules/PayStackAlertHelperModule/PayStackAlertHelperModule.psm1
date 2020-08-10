@@ -72,14 +72,14 @@ hashtable. The slack message
     )
     
     $encodedEvent = EncodeSlackHtmlEntities -ToEncode $Alert.event
-    $AlertJsonData = $Alert.Data | ConvertTo-Json
+    $AlertJsonData = $Alert.Data | ConvertTo-Json  -Depth 4
     
     $slackMessage = @{ 
         channel = "#$($Channel)"
         attachments = @(
             @{
                 color= "good"
-                title = "$($encodedEvent) for $($Alert.Data.Amount)kobo from $($Alert.customer.first_name) $($Alert.customer.last_name)"
+                title = "$($encodedEvent) for $($AleAlertJsonDatart.Data.Amount)kobo from $($AlertJsonData.customer.first_name) $($AlertJsonData.customer.last_name)"
                 text = "$($AlertJsonData)"
             }
         ) 
