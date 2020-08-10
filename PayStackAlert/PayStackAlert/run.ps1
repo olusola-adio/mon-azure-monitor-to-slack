@@ -100,13 +100,12 @@ if($null -eq $request.Body.event) {
 }
 
 
-$body = $request.Body | ConvertTo-Json
+$body = $request.Body | ConvertTo-Json -Depth 4
 Write-Information "body $($body)" -Verbose
 
 $jsonRequest = @{    
     paystack = "request"
     body = "$body"
-
 }
 
 Write-Information "jsonRequest $($jsonRequest)" -Verbose
