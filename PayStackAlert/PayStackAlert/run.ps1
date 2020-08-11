@@ -43,7 +43,7 @@ Import-Module PayStackAlertHelperModule
 Write-Host "PowerShell HTTP trigger function processed a request."
 
 $channel = $Request.Query.Channel
-$slackToken = $env:SLACKTOKEN
+$slackToken = $env:SLACKTOKENPAYSTACK
 
 
 # String key = "YOUR_SECRET_KEY"; //replace with your paystack secret_key

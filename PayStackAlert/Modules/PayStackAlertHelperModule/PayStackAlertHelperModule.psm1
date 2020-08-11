@@ -73,15 +73,15 @@ hashtable. The slack message
     
 
     $alertAttachmentColours = @{
-        "charge.success" = "#ff0000"
-        "subscription.create" = "#ff0000"
-        "transfer.success" = "#ff0000"
-        "transfer.reversed" = "#ff0000"
-        "invoice.create" = "#ff0000"
-        "paymentrequest.success" ="#ff0000"
+        "charge.success" = "#00a86b"
+        "subscription.create" = "#00a86b"
+        "transfer.success" = "#00a86b"
+        "transfer.reversed" = "#00a86b"
+        "invoice.create" = "#00a86b"
+        "paymentrequest.success" ="#00a86b"
         "paymentrequest.pending" = "#ff7e00"
-        "transfer.failed" = "#00a86b"
-        "invoice.payment_failed" = "#00a86b"
+        "transfer.failed" = "#ff0000"
+        "invoice.payment_failed" = "#ff0000"
     }
 
     $encodedEvent = EncodeSlackHtmlEntities -ToEncode $Alert.event
