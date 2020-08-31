@@ -129,6 +129,8 @@ boolean.
     )
     
 
+
+
     $tableName = "paystackmessages"
     $appSharedStorageAccountName = "mondevappsharedtsr"
     $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
@@ -146,7 +148,7 @@ boolean.
                 -partitionKey "$($Alert.event)" `
                 -operator Equal
 
-    if (null -eq $result) {
+    if ($null -eq $result) {
 
         Write-Information "Add new record"
         Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
