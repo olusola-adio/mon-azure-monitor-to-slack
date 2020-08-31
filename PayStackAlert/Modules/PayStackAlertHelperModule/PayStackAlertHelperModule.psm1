@@ -134,11 +134,17 @@ boolean.
     $tableName = "paystackmessages"
     $appSharedStorageAccountName = "mondevappsharedtsr"
     $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
+    $subscriptionName ="cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224"
 
-    $storageAccount = (Get-AzStorageAccount  `
-      -ResourceGroupName $appSharedResourceGroupName  `
-      -Name $appSharedStorageAccountName)
-    $ctx = $storageAccount.Context
+    # Log on to Azure and set the active subscription
+    Add-AzAccount
+    Select-AzSubscription -SubscriptionId $subscriptionName
+
+    # Get the storage key for the storage account
+    $storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $appSharedResourceGroupName -Name $appSharedStorageAccountName).Value[0]
+
+    # Get a storage context
+    $ctx = New-AzStorageContext -StorageAccountName $appSharedStorageAccountName -StorageAccountKey $storageAccountKey
 
     $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
 
