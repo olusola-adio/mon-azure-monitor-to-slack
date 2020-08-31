@@ -78,6 +78,7 @@ hashtable. The slack message
         "transfer.success" = "#00a86b"
         "transfer.reversed" = "#00a86b"
         "invoice.create" = "#00a86b"
+        "invoice.update" = "#00a86b"
         "paymentrequest.success" ="#00a86b"
         "paymentrequest.pending" = "#ff7e00"
         "transfer.failed" = "#ff0000"
@@ -100,6 +101,65 @@ hashtable. The slack message
 
     return $slackMessage
 }
+
+
+function Test-SlackMessage
+{
+<#
+.SYNOPSIS
+
+Tests whether a slack message should be sent
+
+.DESCRIPTION
+
+Creates an object representing a slack message from given azure monitor alert message data.
+
+.Parameter alert
+
+An object representing the alert 
+
+.OUTPUTS
+
+boolean. 
+#>
+
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable] $Alert
+    )
+    
+
+    $tableName = "paystackmessages"
+    $appSharedStorageAccountName = "mondevappsharedtsr"
+    $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
+
+    $storageAccount = (Get-AzStorageAccount  `
+      -ResourceGroupName $appSharedResourceGroupName  `
+      -Name $appSharedStorageAccountName)
+    $ctx = $storageAccount.Context
+
+    $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
+
+    $result = Get-AzTableRow -table $cloudTable `
+                -columnName "payStackId" `
+                -value "$($Alert.Data.id)" `
+                -partitionKey "$($Alert.event)" `
+                -operator Equal
+
+    if (null -eq $result) {
+
+        Write-Information "Add new record"
+        Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
+
+        Write-Information "return true"
+        return $true
+    }
+    
+
+    Write-Information "return false"
+    return $false
+}
+
 
 function Push-OutputBindingWrapper 
 {

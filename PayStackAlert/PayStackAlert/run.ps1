@@ -137,7 +137,15 @@ if ($signature -ne $suppliedSignature) {
     #return
 }
 
+$SendSlack = Test-SlackMessage -Alert $Request.Body
+if ($SendSlack -eq $false) {
+    Write-Information "Dont send message"
+    Push-OutputBindingWrapper -Status OK -Body "success"
+    return
+}
 
+
+Write-Information "Send message"
 $message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
 
 try {    
