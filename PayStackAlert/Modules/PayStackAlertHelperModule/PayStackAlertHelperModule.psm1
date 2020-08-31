@@ -154,7 +154,7 @@ boolean.
     #             -partitionKey "$($Alert.event)" `
     #             -operator Equal
 
-    $tableStorageCurr = $in = Get-Content $inputTable -Raw | ConvertFrom-Json
+    $tableStorageCurr = Get-Content $inputTable -Raw | ConvertFrom-Json
 
     $currStorageItem = $tableStorageCurr | where-object RowKey -eq $Alert.Data.id
 
