@@ -136,29 +136,25 @@ boolean.
     $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
     $subscriptionName ="cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224"
 
-    # # Log on to Azure and set the active subscription
-    # Add-AzAccount
-    # Select-AzSubscription -SubscriptionId $subscriptionName
+    # Log on to Azure and set the active subscription
+    Connect-AzAccount -Identity
+    Select-AzSubscription -SubscriptionId $subscriptionName
 
-    # # Get the storage key for the storage account
-    # $storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $appSharedResourceGroupName -Name $appSharedStorageAccountName).Value[0]
+    # Get the storage key for the storage account
+    $storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $appSharedResourceGroupName -Name $appSharedStorageAccountName).Value[0]
 
-    # # Get a storage context
-    # $ctx = New-AzStorageContext -StorageAccountName $appSharedStorageAccountName -StorageAccountKey $storageAccountKey
+    # Get a storage context
+    $ctx = New-AzStorageContext -StorageAccountName $appSharedStorageAccountName -StorageAccountKey $storageAccountKey
 
-    # $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
+    $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
 
-    # $result = Get-AzTableRow -table $cloudTable `
-    #             -columnName "payStackId" `
-    #             -value "$($Alert.Data.id)" `
-    #             -partitionKey "$($Alert.event)" `
-    #             -operator Equal
+    $result = Get-AzTableRow -table $cloudTable `
+                -columnName "payStackId" `
+                -value "$($Alert.Data.id)" `
+                -partitionKey "$($Alert.event)" `
+                -operator Equal
 
-    $tableStorageCurr = Get-Content $inputTable -Raw | ConvertFrom-Json
-
-    $currStorageItem = $tableStorageCurr | where-object RowKey -eq $Alert.Data.id
-
-    if ($null -eq $currStorageItem) {
+    if ($null -eq $result) {
 
         $tableStorageItems = @()
 

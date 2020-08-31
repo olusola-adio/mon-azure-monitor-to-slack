@@ -36,7 +36,7 @@ Meta-data about the functions invocation. Populated by the Azure Function runtim
 
 using namespace System.Net
 
-param($Request, $TriggerMetadata, $inputTable, $outputTable)
+param($Request, $TriggerMetadata, $inputTable)
 
 Import-Module PayStackAlertHelperModule
 
@@ -139,30 +139,35 @@ if ($signature -ne $suppliedSignature) {
 
 
 
-$tableStorageCurr = Get-Content $inputTable -Raw | ConvertFrom-Json
+# $tableStorageCurr = Get-Content $inputTable -Raw | ConvertFrom-Json
 
-$currStorageItem = $tableStorageCurr | where-object RowKey -eq $Request.Body.Data.id
+# $currStorageItem = $tableStorageCurr | where-object RowKey -eq $Request.Body.Data.id
 
-if ($null -ne $currStorageItem) {
+# if ($null -ne $currStorageItem) {
+#     Write-Information "Dont send message"
+#     Push-OutputBindingWrapper -Status OK -Body "success"
+#     return
+# }
+
+# $tableStorageItems = @()
+
+# $tableStorageItems += [PSObject]@{
+# PartitionKey = $Request.Body.event
+# RowKey = $Request.Body.Data.id
+# payStackId = $Request.Body.Data.id
+# }
+
+# $tableStorageItems | ConvertTo-Json | Out-File -Encoding UTF8 $outputTable
+
+# Write-Information "Added new record"
+# #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
+
+$SendSlack = Test-SlackMessage -Alert $Request.Body
+if ($SendSlack -eq $false) {
     Write-Information "Dont send message"
     Push-OutputBindingWrapper -Status OK -Body "success"
     return
 }
-
-$tableStorageItems = @()
-
-$tableStorageItems += [PSObject]@{
-PartitionKey = $Request.Body.event
-RowKey = $Request.Body.Data.id
-payStackId = $Request.Body.Data.id
-}
-
-$tableStorageItems | ConvertTo-Json | Out-File -Encoding UTF8 $outputTable
-
-Write-Information "Added new record"
-#Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
-
-
 
 Write-Information "Send message"
 $message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
