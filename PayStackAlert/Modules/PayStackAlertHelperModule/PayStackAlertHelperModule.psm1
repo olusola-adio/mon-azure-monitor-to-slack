@@ -136,28 +136,42 @@ boolean.
     $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
     $subscriptionName ="cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224"
 
-    # Log on to Azure and set the active subscription
-    Add-AzAccount
-    Select-AzSubscription -SubscriptionId $subscriptionName
+    # # Log on to Azure and set the active subscription
+    # Add-AzAccount
+    # Select-AzSubscription -SubscriptionId $subscriptionName
 
-    # Get the storage key for the storage account
-    $storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $appSharedResourceGroupName -Name $appSharedStorageAccountName).Value[0]
+    # # Get the storage key for the storage account
+    # $storageAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $appSharedResourceGroupName -Name $appSharedStorageAccountName).Value[0]
 
-    # Get a storage context
-    $ctx = New-AzStorageContext -StorageAccountName $appSharedStorageAccountName -StorageAccountKey $storageAccountKey
+    # # Get a storage context
+    # $ctx = New-AzStorageContext -StorageAccountName $appSharedStorageAccountName -StorageAccountKey $storageAccountKey
 
-    $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
+    # $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
 
-    $result = Get-AzTableRow -table $cloudTable `
-                -columnName "payStackId" `
-                -value "$($Alert.Data.id)" `
-                -partitionKey "$($Alert.event)" `
-                -operator Equal
+    # $result = Get-AzTableRow -table $cloudTable `
+    #             -columnName "payStackId" `
+    #             -value "$($Alert.Data.id)" `
+    #             -partitionKey "$($Alert.event)" `
+    #             -operator Equal
 
-    if ($null -eq $result) {
+    $tableStorageCurr = $in = Get-Content $inputTable -Raw | ConvertFrom-Json
 
-        Write-Information "Add new record"
-        Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
+    $currStorageItem = $tableStorageCurr | where-object RowKey -eq $Alert.Data.id
+
+    if ($null -eq $currStorageItem) {
+
+        $tableStorageItems = @()
+
+        $tableStorageItems += [PSObject]@{
+        PartitionKey = $Alert.event
+        RowKey = $Alert.Data.id
+        payStackId = $Alert.Data.id
+        }
+
+        $tableStorageItems | ConvertTo-Json | Out-File -Encoding UTF8 $outputTable
+
+        Write-Information "Added new record"
+        #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
         Write-Information "return true"
         return $true

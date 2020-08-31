@@ -13,6 +13,20 @@
       "type": "http",
       "direction": "out",
       "name": "Response"
+    },
+    {
+      "type": "table",
+      "name": "outputTable",
+      "tableName": "paystackmessages",
+      "connection": "AzureWebJobsStorage",
+      "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "inputTable",   
+      "tableName": "paystackmessages",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
     }
   ]
 }
