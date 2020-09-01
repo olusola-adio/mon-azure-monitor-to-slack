@@ -213,6 +213,7 @@ boolean.
     }
     
     $queryURL = "$($tableURL)?`$filter=(payStackId eq '$($Alert.Data.Id)')"
+    Write-Information " query $($queryURL)"
     $NICitem = Invoke-RestMethod -Method GET -Uri $queryURL -Headers $headers -ContentType application/json
     $NICitem.value
 

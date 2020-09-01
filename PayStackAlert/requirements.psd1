@@ -3,5 +3,6 @@
 # See https://aka.ms/functionsmanageddependency for additional information.
 @{
     # For latest supported version, go to 'https://www.powershellgallery.com/packages/Az'. 
-    'AzTable' = '3.*';'Az' = '3.*'
+    'AzTable' = '2.*'
+    'Az' = '3.*'
 }
