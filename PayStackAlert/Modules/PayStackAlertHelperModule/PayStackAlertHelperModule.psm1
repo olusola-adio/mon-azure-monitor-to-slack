@@ -215,7 +215,7 @@ boolean.
     $queryURL = "$($tableURL)?`$filter=(payStackId eq '$($Alert.data.id)')"
     Write-Information " query $($queryURL)"
     $NICitem = Invoke-RestMethod -Method GET -Uri $queryURL -Headers $headers -ContentType application/json
-    $NICitem.value
+    #$NICitem.value
 
     $bob = $NICitem.value | ConvertTo-Json  -Depth 4
 
@@ -225,7 +225,7 @@ boolean.
 
     Write-Information "result json $($bob)"
 
-    if ($null -eq $NICitem.value) {
+    if ($null -eq $NICitem.value.payStackId) {
 
         # Write-Information "Adding new record"
         # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
