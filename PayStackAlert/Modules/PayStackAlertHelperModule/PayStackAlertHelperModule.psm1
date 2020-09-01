@@ -166,6 +166,71 @@ boolean.
     return $false
 }
 
+function Test-SlackMessage2
+{
+<#
+.SYNOPSIS
+
+Tests whether a slack message should be sent
+
+.DESCRIPTION
+
+Creates an object representing a slack message from given azure monitor alert message data.
+
+.Parameter alert
+
+An object representing the alert 
+
+.OUTPUTS
+
+boolean. 
+#>
+
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable] $Alert
+    )
+    
+
+
+
+    $storageAccountName = "mondevappsharedstr"
+    $storageAccountkey = "jt3lAdSS9ij0OQzFv+LBS5NwM82wHPF94I6/bMaFWgRJUTxGw+l6ek7Wqss9Y1A8Vx3G2QFHR6g0vDV6vM2/ug=="
+    $tableName = "paystackmessages"
+    $apiVersion = "2017-04-17"
+    $tableURL = "https://$($storageAccountName).table.core.windows.net/$($tableName)"
+    $GMTime = (Get-Date).ToUniversalTime().toString('R')
+    $string = "$($GMTime)`n/$($storageAccountName)/$($tableName)"
+    $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+    $hmacsha.key = [Convert]::FromBase64String($storageAccountkey)
+    $signature = $hmacsha.ComputeHash([Text.Encoding]::UTF8.GetBytes($string))
+    $signature = [Convert]::ToBase64String($signature)
+    $headers = @{    
+        Authorization  = "SharedKeyLite " + $storageAccountName + ":" + $signature
+        Accept         = "application/json;odata=fullmetadata"
+        'x-ms-date'    = $GMTime
+        "x-ms-version" = $apiVersion
+    }
+    
+    $queryURL = "$($tableURL)?`$filter=(payStackId eq '$($Alert.Data.Id)')"
+    $NICitem = Invoke-RestMethod -Method GET -Uri $queryURL -Headers $headers -ContentType application/json
+    $NICitem.value
+
+
+    Write-Information " result $($NICitem.value)"
+    if ($null -eq $NICitem.value) {
+
+        # Write-Information "Adding new record"
+        # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
+
+        Write-Information "return true"
+        return $true
+    }
+    
+
+    Write-Information "return false"
+    return $false
+}
 
 function Push-OutputBindingWrapper 
 {
