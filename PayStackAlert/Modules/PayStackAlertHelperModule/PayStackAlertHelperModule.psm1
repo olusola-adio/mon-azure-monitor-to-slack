@@ -136,8 +136,8 @@ boolean.
     $appSharedResourceGroupName = "mon-dev-app-sharedresources-rg"
     $subscriptionName ="cb5ab4a7-dd08-4be3-9d7e-9f68ae30f224"
 
-    Install-Module -Name AzTable -Force
-    Import-Module AzTable
+    # Install-Module -Name AzTable -Force
+    # Import-Module AzTable
     # Log on to Azure and set the active subscription
     Connect-AzAccount -Identity
     Select-AzSubscription -SubscriptionId $subscriptionName
