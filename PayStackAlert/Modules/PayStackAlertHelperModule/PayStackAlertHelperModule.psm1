@@ -217,8 +217,14 @@ boolean.
     $NICitem = Invoke-RestMethod -Method GET -Uri $queryURL -Headers $headers -ContentType application/json
     $NICitem.value
 
+    $bob = $NICitem.value | ConvertTo-Json  -Depth 4
 
-    Write-Information " result $($NICitem.value)"
+    Write-Information " result $($NICitem)"
+
+    Write-Information " result value $($NICitem.value)"
+
+    Write-Information "result json $($bob)"
+
     if ($null -eq $NICitem.value) {
 
         # Write-Information "Adding new record"
