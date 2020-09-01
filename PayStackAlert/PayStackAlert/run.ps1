@@ -36,7 +36,7 @@ Meta-data about the functions invocation. Populated by the Azure Function runtim
 
 using namespace System.Net
 
-param($Request, $TriggerMetadata, $inputTable)
+param($Request, $TriggerMetadata)
 
 Import-Module PayStackAlertHelperModule
 
