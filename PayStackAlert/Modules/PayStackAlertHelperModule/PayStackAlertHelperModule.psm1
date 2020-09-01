@@ -148,11 +148,7 @@ boolean.
 
     $cloudTable = (Get-AzStorageTable –Name $tableName –Context $ctx).CloudTable
 
-    $result = Get-AzTableRow -table $cloudTable `
-                -columnName "payStackId" `
-                -value "$($Alert.Data.id)" `
-                -partitionKey "$($Alert.event)" `
-                -operator Equal
+    $result = Get-AzTableRow -table $cloudTable -rowKey "$($Alert.Data.id)" -partitionKey "$($Alert.event)" 
 
     if ($null -eq $result) {
 
