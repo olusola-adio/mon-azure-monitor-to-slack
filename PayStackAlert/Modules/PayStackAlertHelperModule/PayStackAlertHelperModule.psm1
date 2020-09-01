@@ -230,6 +230,13 @@ boolean.
         # Write-Information "Adding new record"
         # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
+        $record = @{
+            PartitionKey = $($Alert.event)
+            RowKey = $($Alert.data.id)
+            payStackId = $($Alert.data.id)
+        }
+        $serializedMessage = $record | ConvertTo-Json
+        Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return true"
         return $true
     }
