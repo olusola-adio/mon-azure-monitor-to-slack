@@ -84,6 +84,12 @@ if ([string]::IsNullOrWhiteSpace($secret)) {
     return 
 }
 
+$storageAccountkey = $env:STORAGEACCOUNTKEY
+if ([string]::IsNullOrWhiteSpace($storageAccountkey)) {
+    Push-OutputBindingWrapper -Status BadRequest -Body "StorageAccountKey key not specified"   
+    return 
+}
+
 if($null -eq $request.Body) { 
     Push-OutputBindingWrapper -Status BadRequest -Body "Unable to parse body as json"
     return
@@ -162,7 +168,7 @@ if ($signature -ne $suppliedSignature) {
 # Write-Information "Added new record"
 # #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
-$SendSlack = Test-SlackMessage2 -Alert $Request.Body
+$SendSlack = Test-SlackMessage2 -Alert $Request.Body -storageAccountKey $storageAccountkey
 if ($false -eq $SendSlack) {
     Write-Information "Dont send message"
     Push-OutputBindingWrapper -Status OK -Body "success"

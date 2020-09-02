@@ -188,14 +188,15 @@ boolean.
 
     param(
         [Parameter(Mandatory=$true)]
-        [hashtable] $Alert
+        [hashtable] $Alert,
+        [Parameter(Mandatory=$true)]
+        [string] $storageAccountkey
     )
     
 
 
 
     $storageAccountName = "mondevappsharedstr"
-    $storageAccountkey = "jt3lAdSS9ij0OQzFv+LBS5NwM82wHPF94I6/bMaFWgRJUTxGw+l6ek7Wqss9Y1A8Vx3G2QFHR6g0vDV6vM2/ug=="
     $tableName = "paystackmessages"
     $apiVersion = "2017-04-17"
     $tableURL = "https://$($storageAccountName).table.core.windows.net/$($tableName)"
@@ -211,13 +212,27 @@ boolean.
         'x-ms-date'    = $GMTime
         "x-ms-version" = $apiVersion
     }
+
     
-    $queryURL = "$($tableURL)?`$filter=(payStackId eq '$($Alert.data.id)')"
+    if ("charge.success" -eq $Alert.event){
+        $uniqueId = $Alert.data.id
+    } elseif ("invoice.update" -eq $Alert.event){
+        $uniqueId = $Alert.data.invoice_code
+    } elseif ("invoice.create" -eq $Alert.event){
+        $uniqueId = $Alert.data.invoice_code
+    } else {
+        $uniqueId = $Alert.data.id
+    }
+
+    
+    $queryURL = "$($tableURL)?`$filter=(RowKey eq '$($uniqueId)' and PartitionKey eq '$($Alert.event)')"
     Write-Information " query $($queryURL)"
     $NICitem = Invoke-RestMethod -Method GET -Uri $queryURL -Headers $headers -ContentType application/json
     #$NICitem.value
 
     $bob = $NICitem.value | ConvertTo-Json  -Depth 4
+
+    $AlertJson = $Alert | ConvertTo-Json -Depth 4
 
     Write-Information " result $($NICitem)"
 
@@ -225,14 +240,13 @@ boolean.
 
     Write-Information "result json $($bob)"
 
-    if ($null -eq $NICitem.value.payStackId) {
+    if ($null -eq $NICitem.value.RowKey) {
 
         # Write-Information "Adding new record"
         # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
             
         $storageAccountName = "mondevappsharedstr"
-        $storageAccountkey = "jt3lAdSS9ij0OQzFv+LBS5NwM82wHPF94I6/bMaFWgRJUTxGw+l6ek7Wqss9Y1A8Vx3G2QFHR6g0vDV6vM2/ug=="
         $tableName = "paystackmessages"
         $apiVersion = "2017-04-17"
         $tableURL = "https://$($storageAccountName).table.core.windows.net/$($tableName)"
@@ -248,12 +262,16 @@ boolean.
             'x-ms-date'    = $GMTime
             "x-ms-version" = $apiVersion
         }
-    
+
         $record = @{
             PartitionKey = $Alert.event
-            RowKey = "$($Alert.data.id)"
-            payStackId = "$($Alert.data.id)"
+            RowKey = "$($uniqueId)"
+            alertJson = "$($AlertJson)"
         }
+
+
+
+
         $serializedMessage = $record | ConvertTo-Json
 
         Write-Information "serialised message $($serializedMessage)"
