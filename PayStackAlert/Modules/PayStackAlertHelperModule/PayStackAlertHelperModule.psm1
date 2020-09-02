@@ -314,7 +314,7 @@ boolean.
             
     }
     
-
+    return $false
 }
 
 function Push-OutputBindingWrapper 
