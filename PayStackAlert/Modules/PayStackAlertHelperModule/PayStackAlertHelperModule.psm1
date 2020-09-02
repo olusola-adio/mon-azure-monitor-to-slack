@@ -242,7 +242,7 @@ boolean.
 
     if ($null -eq $NICitem.value.RowKey) {
 
-        # Write-Information "Adding new record"
+        Write-Information "Adding new record to $tableName"
         # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
             
@@ -266,11 +266,9 @@ boolean.
         $record = @{
             PartitionKey = $Alert.event
             RowKey = "$($uniqueId)"
-            alertJson = "$($AlertJson)"
+            Name = "$($Alert.Data.customer.first_name) $($Alert.Data.customer.last_name)"
+            AlertJson = "$($AlertJson)"
         }
-
-
-
 
         $serializedMessage = $record | ConvertTo-Json
 
@@ -278,11 +276,45 @@ boolean.
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return true"
         return $true
+        
+    } else {
+
+        Write-Information "Adding new record to duplicate table"
+        $storageAccountName = "mondevappsharedstr"
+        $tableName = "duplicates"
+        $apiVersion = "2017-04-17"
+        $tableURL = "https://$($storageAccountName).table.core.windows.net/$($tableName)"
+        $GMTime = (Get-Date).ToUniversalTime().toString('R')
+        $string = "$($GMTime)`n/$($storageAccountName)/$($tableName)"
+        $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+        $hmacsha.key = [Convert]::FromBase64String($storageAccountkey)
+        $signature = $hmacsha.ComputeHash([Text.Encoding]::UTF8.GetBytes($string))
+        $signature = [Convert]::ToBase64String($signature)
+        $headers = @{    
+            Authorization  = "SharedKeyLite " + $storageAccountName + ":" + $signature
+            Accept         = "application/json;odata=fullmetadata"
+            'x-ms-date'    = $GMTime
+            "x-ms-version" = $apiVersion
+        }
+
+        $RowTime = (Get-Date).ToUniversalTime().toString('yyyyMMddHHmmss')
+
+        $record = @{
+            PartitionKey = "$($Alert.Data.customer.first_name)_$($Alert.Data.customer.last_name)"
+            RowKey = "$($RowTime)"
+            Name = "$($Alert.Data.customer.first_name) $($Alert.Data.customer.last_name)"
+        }
+
+        $serializedMessage = $record | ConvertTo-Json
+
+        Write-Information "serialised message $($serializedMessage)"
+        Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
+        Write-Information "return false"
+        return $false
+            
     }
     
 
-    Write-Information "return false"
-    return $false
 }
 
 function Push-OutputBindingWrapper 
