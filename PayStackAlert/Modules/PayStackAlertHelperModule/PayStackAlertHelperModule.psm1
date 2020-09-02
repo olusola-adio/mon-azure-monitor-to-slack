@@ -230,12 +230,32 @@ boolean.
         # Write-Information "Adding new record"
         # Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
+            
+        $storageAccountName = "mondevappsharedstr"
+        $storageAccountkey = "jt3lAdSS9ij0OQzFv+LBS5NwM82wHPF94I6/bMaFWgRJUTxGw+l6ek7Wqss9Y1A8Vx3G2QFHR6g0vDV6vM2/ug=="
+        $tableName = "paystackmessages"
+        $apiVersion = "2017-04-17"
+        $tableURL = "https://$($storageAccountName).table.core.windows.net/$($tableName)"
+        $GMTime = (Get-Date).ToUniversalTime().toString('R')
+        $string = "$($GMTime)`n/$($storageAccountName)/$($tableName)"
+        $hmacsha = New-Object System.Security.Cryptography.HMACSHA256
+        $hmacsha.key = [Convert]::FromBase64String($storageAccountkey)
+        $signature = $hmacsha.ComputeHash([Text.Encoding]::UTF8.GetBytes($string))
+        $signature = [Convert]::ToBase64String($signature)
+        $headers = @{    
+            Authorization  = "SharedKeyLite " + $storageAccountName + ":" + $signature
+            Accept         = "application/json;odata=fullmetadata"
+            'x-ms-date'    = $GMTime
+            "x-ms-version" = $apiVersion
+        }
+    
         $record = @{
             PartitionKey = $Alert.event
-            RowKey = $Alert.data.id
-            payStackId = $Alert.data.id
+            RowKey = "$($Alert.data.id)"
+            payStackId = "$($Alert.data.id)"
         }
         $serializedMessage = $record | ConvertTo-Json
+
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return true"
