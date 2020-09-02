@@ -240,6 +240,8 @@ boolean.
 
     Write-Information "result json $($bob)"
 
+    $returnValue = $false
+
     if ($null -eq $NICitem.value.RowKey) {
 
         Write-Information "Adding new record to $tableName"
@@ -271,11 +273,11 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-
+        $returnValue = $true
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
-        Write-Information "return true"
-        return $true
+        Write-Information "return $returnValue"
+
         
     } else {
 
@@ -306,15 +308,13 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-
+        $returnValue = $false
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
-        Write-Information "return false"
-        return $false
-            
+        Write-Information "return $returnValue"            
     }
     
-    return $false
+    return $returnValue
 }
 
 function Push-OutputBindingWrapper 
