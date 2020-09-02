@@ -169,7 +169,8 @@ if ($signature -ne $suppliedSignature) {
 # #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
 $SendSlack = Test-SlackMessage2 -Alert $Request.Body -storageAccountKey $storageAccountkey
-if ($false -eq $SendSlack) {
+Write-Information "back to run.ps1 $SendSlack"
+if (0 -eq $SendSlack) {
     Write-Information "Dont send message"
     Push-OutputBindingWrapper -Status OK -Body "success"
     return

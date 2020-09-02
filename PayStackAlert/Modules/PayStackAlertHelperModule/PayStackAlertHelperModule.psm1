@@ -240,7 +240,7 @@ boolean.
 
     Write-Information "result json $($bob)"
 
-    $returnValue = $false
+    $returnValue = 0
 
     if ($null -eq $NICitem.value.RowKey) {
 
@@ -273,7 +273,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = $true
+        $returnValue = 1
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"
@@ -308,7 +308,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = $false
+        $returnValue = 0
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"            
