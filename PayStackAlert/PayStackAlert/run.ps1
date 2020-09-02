@@ -170,21 +170,25 @@ if ($signature -ne $suppliedSignature) {
 
 $SendSlack = Test-SlackMessage2 -Alert $Request.Body -storageAccountKey $storageAccountkey
 Write-Information "back to run.ps1 $SendSlack"
-if (0 -eq $SendSlack) {
+if ($SendSlack -eq 0) {
+
     Write-Information "Dont send message"
     Push-OutputBindingWrapper -Status OK -Body "success"
     return
-}
 
-Write-Information "Send message"
-$message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
+} else {
 
-try {    
-    Send-MessageToSlack -SlackToken $slackToken -Message $message
-}
-catch {
-    Push-OutputBindingWrapper -Status BadRequest -Body ("Unable to send slack message:", $_.Exception.Message)
-    return     
-}
+    Write-Information "Send message"
+    $message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
+
+    try {    
+        Send-MessageToSlack -SlackToken $slackToken -Message $message
+    }
+    catch {
+        Push-OutputBindingWrapper -Status BadRequest -Body ("Unable to send slack message:", $_.Exception.Message)
+        return     
+    }
 
 Push-OutputBindingWrapper -Status OK -Body "success"
+}
+
