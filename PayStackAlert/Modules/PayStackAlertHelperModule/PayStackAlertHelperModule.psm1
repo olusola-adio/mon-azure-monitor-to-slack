@@ -166,7 +166,7 @@ boolean.
     return $false
 }
 
-function Test-SlackMessage2
+function Test-ShouldSendSlackMessage
 {
 <#
 .SYNOPSIS
@@ -186,7 +186,7 @@ An object representing the alert
 boolean. 
 #>
 
-    [OutputType([String])]
+    [OutputType([bool])]
     param(
         [Parameter(Mandatory=$true)]
         [hashtable] $Alert,
@@ -272,7 +272,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = "yes"
+        $returnValue = $true
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"
@@ -307,7 +307,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = "no"
+        $returnValue = $false
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"            
