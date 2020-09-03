@@ -186,6 +186,7 @@ An object representing the alert
 boolean. 
 #>
 
+    [OutputType([String])]
     param(
         [Parameter(Mandatory=$true)]
         [hashtable] $Alert,
@@ -239,8 +240,6 @@ boolean.
     Write-Information " result value $($NICitem.value)"
 
     Write-Information "result json $($bob)"
-
-    $returnValue = "no"
 
     if ($null -eq $NICitem.value.RowKey) {
 
@@ -314,7 +313,7 @@ boolean.
         Write-Information "return $returnValue"            
     }
     
-    return $returnValue
+    $returnValue
 }
 
 function Push-OutputBindingWrapper 
