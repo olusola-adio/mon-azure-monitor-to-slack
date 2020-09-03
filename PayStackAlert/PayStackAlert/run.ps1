@@ -168,9 +168,10 @@ if ($signature -ne $suppliedSignature) {
 # Write-Information "Added new record"
 # #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
 
-$SendSlack =   Test-ShouldSendSlackMessage -Alert $Request.Body -storageAccountKey $storageAccountkey
-Write-Information "back to run.ps1 with function result $SendSlack"
-if ($SendSlack -eq $false) {
+$SendSlack = Test-ShouldSendSlackMessage -Alert $Request.Body -storageAccountKey $storageAccountkey
+#$SendSlack = [System.Convert]::ToString($objSendSlack)
+Write-Information "back to run.ps1 $SendSlack"
+if ($SendSlack -eq "no") {
 
     Write-Information "Dont send message"
     Push-OutputBindingWrapper -Status OK -Body "success"

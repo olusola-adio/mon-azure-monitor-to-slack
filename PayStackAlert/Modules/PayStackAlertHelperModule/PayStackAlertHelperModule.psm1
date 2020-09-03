@@ -186,7 +186,7 @@ An object representing the alert
 boolean. 
 #>
 
-    [OutputType([bool])]
+    [OutputType([String])]
     param(
         [Parameter(Mandatory=$true)]
         [hashtable] $Alert,
@@ -272,7 +272,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = $true
+        $returnValue = "yes"
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"
@@ -307,7 +307,7 @@ boolean.
         }
 
         $serializedMessage = $record | ConvertTo-Json
-        $returnValue = $false
+        $returnValue = "no"
         Write-Information "serialised message $($serializedMessage)"
         Invoke-RestMethod -Method POST -Uri $tableURL -Headers $headers -ContentType application/json -Body $serializedMessage
         Write-Information "return $returnValue"            
