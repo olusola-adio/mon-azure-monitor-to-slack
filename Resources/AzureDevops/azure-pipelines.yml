@@ -50,6 +50,7 @@ steps:
     contents: |
       Modules/**
       PayStackAlert/**
+      requirements.psd1
     targetFolder: '$(Build.SourcesDirectory)/MonitorAlertZip'
 
 - task: ArchiveFiles@2

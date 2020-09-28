@@ -84,6 +84,12 @@ if ([string]::IsNullOrWhiteSpace($secret)) {
     return 
 }
 
+$storageAccountkey = $env:STORAGEACCOUNTKEY
+if ([string]::IsNullOrWhiteSpace($storageAccountkey)) {
+    Push-OutputBindingWrapper -Status BadRequest -Body "StorageAccountKey key not specified"   
+    return 
+}
+
 if($null -eq $request.Body) { 
     Push-OutputBindingWrapper -Status BadRequest -Body "Unable to parse body as json"
     return
@@ -138,14 +144,52 @@ if ($signature -ne $suppliedSignature) {
 }
 
 
-$message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
 
-try {    
-    Send-MessageToSlack -SlackToken $slackToken -Message $message
-}
-catch {
-    Push-OutputBindingWrapper -Status BadRequest -Body ("Unable to send slack message:", $_.Exception.Message)
-    return     
+# $tableStorageCurr = Get-Content $inputTable -Raw | ConvertFrom-Json
+
+# $currStorageItem = $tableStorageCurr | where-object RowKey -eq $Request.Body.Data.id
+
+# if ($null -ne $currStorageItem) {
+#     Write-Information "Dont send message"
+#     Push-OutputBindingWrapper -Status OK -Body "success"
+#     return
+# }
+
+# $tableStorageItems = @()
+
+# $tableStorageItems += [PSObject]@{
+# PartitionKey = $Request.Body.event
+# RowKey = $Request.Body.Data.id
+# payStackId = $Request.Body.Data.id
+# }
+
+# $tableStorageItems | ConvertTo-Json | Out-File -Encoding UTF8 $outputTable
+
+# Write-Information "Added new record"
+# #Add-AzTableRow -table $cloudTable -partitionKey $($Alert.event) -rowKey $($Alert.Data.id) -property @{"payStackId"=$($Alert.Data.id)} 
+
+$SendSlack = Test-ShouldSendSlackMessage -Alert $Request.Body -storageAccountKey $storageAccountkey
+#$SendSlack = [System.Convert]::ToString($objSendSlack)
+Write-Information "back to run.ps1 $SendSlack"
+if ($SendSlack -eq "no") {
+
+    Write-Information "Dont send message"
+    Push-OutputBindingWrapper -Status OK -Body "success"
+    return
+
+} else {
+
+    Write-Information "Send message"
+    $message = New-SlackMessageFromAlert -Alert $Request.Body -Channel $channel
+
+    try {    
+        Send-MessageToSlack -SlackToken $slackToken -Message $message
+    }
+    catch {
+        Push-OutputBindingWrapper -Status BadRequest -Body ("Unable to send slack message:", $_.Exception.Message)
+        return     
+    }
+
+    Push-OutputBindingWrapper -Status OK -Body "success"
 }
 
-Push-OutputBindingWrapper -Status OK -Body "success"
