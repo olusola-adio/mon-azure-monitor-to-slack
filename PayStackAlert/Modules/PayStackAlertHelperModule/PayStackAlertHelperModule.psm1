@@ -298,7 +298,7 @@ boolean.
             "x-ms-version" = $apiVersion
         }
 
-        $RowTime = (Get-Date).ToUniversalTime().toString('yyyyMMddHHmmss')
+        $RowTime = (Get-Date).ToUniversalTime().toString('yyyyMMddHHmmssfff')
 
         $record = @{
             PartitionKey = "$($Alert.Data.customer.first_name)_$($Alert.Data.customer.last_name)"
