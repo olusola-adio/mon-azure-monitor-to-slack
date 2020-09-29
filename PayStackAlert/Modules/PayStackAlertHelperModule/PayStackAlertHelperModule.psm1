@@ -75,6 +75,7 @@ hashtable. The slack message
     $alertAttachmentColours = @{
         "charge.success" = "#00a86b"
         "subscription.create" = "#00a86b"
+        "subscription.disable" = "#ff0000"
         "transfer.success" = "#00a86b"
         "transfer.reversed" = "#00a86b"
         "invoice.create" = "#00a86b"
@@ -221,6 +222,10 @@ boolean.
         $uniqueId = $Alert.data.invoice_code
     } elseif ("invoice.create" -eq $Alert.event){
         $uniqueId = $Alert.data.invoice_code
+    } elseif ("subscription.disable" -eq $Alert.event){
+        $uniqueId = $Alert.data.plan.plan_code
+    } elseif ("subscription.create" -eq $Alert.event){
+        $uniqueId = $Alert.data.plan.plan_code
     } else {
         $uniqueId = $Alert.data.id
     }
