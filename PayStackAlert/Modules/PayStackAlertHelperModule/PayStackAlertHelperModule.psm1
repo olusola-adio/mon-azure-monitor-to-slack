@@ -75,6 +75,7 @@ hashtable. The slack message
     $alertAttachmentColours = @{
         "charge.success" = "#00a86b"
         "subscription.create" = "#00a86b"
+        "subscription.disable" = "#ff0000"
         "transfer.success" = "#00a86b"
         "transfer.reversed" = "#00a86b"
         "invoice.create" = "#00a86b"
