@@ -221,6 +221,8 @@ boolean.
         $uniqueId = $Alert.data.invoice_code
     } elseif ("invoice.create" -eq $Alert.event){
         $uniqueId = $Alert.data.invoice_code
+    } elseif ("invoice.disable" -eq $Alert.event){
+        $uniqueId = $Alert.data.plan.plan_code
     } else {
         $uniqueId = $Alert.data.id
     }
